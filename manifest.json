@@ -1,0 +1,158 @@
+{
+  "version": "1.0",
+  "description": "CLAIR Skill Manifest — maps task domains to skill files and MCP tools",
+  "skills": [
+    {
+      "id": "documents",
+      "path": "skills/domains/documents.md",
+      "token_cost": 380,
+      "triggers": ["document", "word", "docx", "pdf", "presentation", "pptx", "slides", "report", "write", "draft"],
+      "children": ["docx", "pdf", "pptx"],
+      "mcp_dependencies": ["filesystem"]
+    },
+    {
+      "id": "coding",
+      "path": "skills/domains/coding.md",
+      "token_cost": 420,
+      "triggers": ["code", "function", "implement", "bug", "refactor", "script", "program", "debug", "test", "build"],
+      "children": ["python", "typescript", "testing"],
+      "mcp_dependencies": ["filesystem", "bash_exec"]
+    },
+    {
+      "id": "data",
+      "path": "skills/domains/data.md",
+      "token_cost": 340,
+      "triggers": ["data", "csv", "excel", "spreadsheet", "analysis", "chart", "graph", "statistics", "dataset", "table"],
+      "children": ["visualization", "ml_pipeline"],
+      "mcp_dependencies": ["filesystem", "python_exec"]
+    },
+    {
+      "id": "research",
+      "path": "skills/domains/research.md",
+      "token_cost": 290,
+      "triggers": ["research", "search", "find", "summarize", "compare", "explain", "what is", "how does", "why"],
+      "children": [],
+      "mcp_dependencies": ["web_search"]
+    }
+  ],
+  "cascades": [
+    {
+      "id": "docx",
+      "parent": "documents",
+      "path": "skills/cascades/documents/docx.md",
+      "token_cost": 560,
+      "triggers": ["word", "docx", ".docx", "word document"]
+    },
+    {
+      "id": "pdf",
+      "parent": "documents",
+      "path": "skills/cascades/documents/pdf.md",
+      "token_cost": 480,
+      "triggers": ["pdf", ".pdf", "portable document"]
+    },
+    {
+      "id": "pptx",
+      "parent": "documents",
+      "path": "skills/cascades/documents/pptx.md",
+      "token_cost": 510,
+      "triggers": ["pptx", "powerpoint", "slides", "presentation", "deck"]
+    },
+    {
+      "id": "python",
+      "parent": "coding",
+      "path": "skills/cascades/coding/python.md",
+      "token_cost": 320,
+      "triggers": ["python", ".py", "django", "flask", "fastapi", "pandas", "numpy"]
+    },
+    {
+      "id": "typescript",
+      "parent": "coding",
+      "path": "skills/cascades/coding/typescript.md",
+      "token_cost": 310,
+      "triggers": ["typescript", "javascript", ".ts", ".js", "node", "react", "next"]
+    },
+    {
+      "id": "testing",
+      "parent": "coding",
+      "path": "skills/cascades/coding/testing.md",
+      "token_cost": 280,
+      "triggers": ["test", "spec", "coverage", "jest", "pytest", "unit test", "integration test"]
+    }
+  ],
+  "ml_offload_registry": [
+    {
+      "id": "sentiment_classification",
+      "triggers": ["classify sentiment", "positive or negative", "sentiment of", "tone of"],
+      "volume_threshold": 3,
+      "backend": "distilbert-base-uncased-finetuned-sst-2-english",
+      "backend_type": "huggingface",
+      "latency_ms": 15,
+      "accuracy": 0.93,
+      "notes": "Use for bulk sentiment. LLM better for nuanced single-item analysis."
+    },
+    {
+      "id": "language_detection",
+      "triggers": ["detect language", "what language is", "language of this text"],
+      "volume_threshold": 1,
+      "backend": "langdetect",
+      "backend_type": "python_library",
+      "latency_ms": 2,
+      "accuracy": 0.99
+    },
+    {
+      "id": "spell_check",
+      "triggers": ["spell check", "fix spelling", "spelling errors"],
+      "volume_threshold": 1,
+      "backend": "pyspellchecker",
+      "backend_type": "python_library",
+      "latency_ms": 5,
+      "accuracy": 0.97
+    },
+    {
+      "id": "tabular_classification",
+      "triggers": ["classify rows", "label this dataset", "predict category for each"],
+      "volume_threshold": 10,
+      "backend": "sklearn_text_classifier",
+      "backend_type": "sklearn",
+      "latency_ms": 8,
+      "accuracy": 0.88,
+      "notes": "Requires pre-trained model. Falls back to LLM if model unavailable."
+    },
+    {
+      "id": "named_entity_extraction",
+      "triggers": ["extract names", "find entities", "extract companies", "extract dates"],
+      "volume_threshold": 5,
+      "backend": "spacy_en_core_web_sm",
+      "backend_type": "spacy",
+      "latency_ms": 10,
+      "accuracy": 0.91
+    },
+    {
+      "id": "regex_extraction",
+      "triggers": ["extract emails", "extract phone numbers", "extract urls", "extract dates from text"],
+      "volume_threshold": 1,
+      "backend": "regex_rules",
+      "backend_type": "rules",
+      "latency_ms": 1,
+      "accuracy": 0.99
+    },
+    {
+      "id": "text_similarity",
+      "triggers": ["are these similar", "similarity score", "how similar", "duplicate detection"],
+      "volume_threshold": 5,
+      "backend": "sentence-transformers/all-MiniLM-L6-v2",
+      "backend_type": "huggingface",
+      "latency_ms": 20,
+      "accuracy": 0.89
+    },
+    {
+      "id": "anomaly_detection",
+      "triggers": ["find anomalies", "detect outliers", "unusual values", "flag anomalies"],
+      "volume_threshold": 20,
+      "backend": "sklearn_isolation_forest",
+      "backend_type": "sklearn",
+      "latency_ms": 25,
+      "accuracy": 0.85
+    }
+  ]
+}
