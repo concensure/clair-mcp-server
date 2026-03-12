@@ -41,8 +41,8 @@ User Request → CLAIR Router (~280 tokens) → Domain Skill → Cascade Skill �
 ## Installation
 
 ```bash
-git clone https://github.com/concensure/clair-mcp
-cd clair-mcp
+git clone https://github.com/concensure/clair-mcp-server.git
+cd clair-mcp-server
 npm install
 npm run build
 ```

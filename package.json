@@ -1,8 +1,16 @@
 {
-  "name": "clair-lazy-skill-loading",
+  "name": "clair-mcp-server",
   "version": "1.0.0",
-  "description": "CLAIR MCP server with lazy skill loading",
+  "description": "CLAIR — Cascaded Lazy AI Routing. MCP server that reduces token burn by lazily loading skills and routing subtasks to ML backends.",
   "main": "dist/server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/concensure/clair-mcp-server.git"
+  },
+  "homepage": "https://github.com/concensure/clair-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/concensure/clair-mcp-server/issues"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
@@ -12,10 +20,14 @@
     "mcp",
     "clair",
     "routing",
-    "skills"
+    "skills",
+    "lazy-loading",
+    "token-savings",
+    "llm",
+    "ai-agent"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Casper Wu",
+  "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "dotenv": "^16.4.5",

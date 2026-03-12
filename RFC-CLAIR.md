@@ -292,8 +292,10 @@ Routing decisions for identical `task_description` inputs SHOULD be cached withi
 
 ## 7. Reference Implementation
 
-A reference implementation is available at:  
+A reference implementation is available at:
 `https://github.com/concensure/clair-mcp-server`
+
+> **Note**: The repository was previously at `https://github.com/concensure/clair-mcp`. The canonical URL is now `https://github.com/concensure/clair-mcp-server`.
 
 It includes:
 - TypeScript MCP server with `clair_route` and `clair_offload` tools
