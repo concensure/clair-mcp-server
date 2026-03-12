@@ -120,6 +120,11 @@ async function main() {
 
   const app = createMcpExpressApp();
 
+  // Health check endpoint for Railway / load balancers
+  app.get('/health', (_req: Request, res: Response) => {
+    res.json({ status: 'ok', server: 'clair-mcp-server', version: '1.0.0' });
+  });
+
   app.post('/mcp', async (req: Request, res: Response) => {
     const server = buildServer(manifest);
     const transport = new StreamableHTTPServerTransport({
