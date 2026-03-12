@@ -120,12 +120,12 @@ async function main() {
   const app = express();
   app.use(express.json());
 
-  // Health check endpoint for Railway / load balancers
+  // Health check endpoint for Railway / load balancers (must be registered first)
   app.get('/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok', server: 'clair-mcp-server', version: '1.0.0' });
   });
 
-  // Shared transport handler for both GET (SSE) and POST (JSON-RPC)
+  // Shared transport handler for GET (SSE) and POST (JSON-RPC)
   const handleMcp = async (req: Request, res: Response) => {
     const server = buildServer(manifest);
     const transport = new StreamableHTTPServerTransport({
@@ -140,9 +140,14 @@ async function main() {
     });
   };
 
+  // MCP endpoint — serve at both /mcp and / so Glama inspector works
+  // regardless of whether the user appends /mcp to the URL or not
   app.get('/mcp', handleMcp);
   app.post('/mcp', handleMcp);
   app.delete('/mcp', handleMcp);
+  app.get('/', handleMcp);
+  app.post('/', handleMcp);
+  app.delete('/', handleMcp);
 
   const port = Number(process.env.PORT ?? 3001);
   const host = process.env.HOST ?? '0.0.0.0';
