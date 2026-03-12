@@ -512,12 +512,49 @@ Special thanks to the `modelcontextprotocol` GitHub community for early discussi
 
 ---
 
-## 11. Revision History
+## 11. Licence
+
+CLAIR is released under the **Apache License, Version 2.0**.
+
+```
+Copyright 2026 Casper Wu
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+### Why Apache 2.0?
+
+| Concern | Apache 2.0 answer |
+|---|---|
+| Commercial use | ✅ Permitted with attribution |
+| Patent grant | ✅ Explicit patent licence from contributors |
+| Modification & distribution | ✅ Permitted under same licence |
+| Proprietary embedding | ✅ Permitted (no copyleft) |
+| Attribution requirement | ✅ NOTICE file / header required |
+
+Apache 2.0 was chosen over MIT because it includes an **explicit patent grant**, which is important for infrastructure-layer software that may be embedded in commercial AI products. It was chosen over GPL/AGPL because CLAIR is intended to be freely embeddable in proprietary agent stacks without forcing those stacks to open-source their own code.
+
+The full licence text is in the [`LICENSE`](./LICENSE) file at the root of this repository.
+
+---
+
+## 12. Revision History
 
 | Version | Date | Summary |
 |---|---|---|
 | 0.1 | 2026-03-06 | Initial draft |
 | 0.2 | 2026-03-12 | Add Section 8: applicability to non-Claude clients (Kilo Code, OpenRouter), rule documents, MCP tool lazy loading. Add A/B test results. Update open questions. |
+| 0.3 | 2026-03-12 | Add Section 11: Licence (Apache 2.0 with rationale). |
 
 ---
 
