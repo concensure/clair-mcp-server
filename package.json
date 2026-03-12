@@ -2,7 +2,10 @@
   "name": "clair-mcp-server",
   "version": "1.0.0",
   "description": "CLAIR — Cascaded Lazy AI Routing. MCP server that reduces token burn by lazily loading skills and routing subtasks to ML backends.",
-  "main": "dist/server.js",
+  "main": "dist/stdio.js",
+  "bin": {
+    "clair-mcp": "dist/stdio.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/concensure/clair-mcp-server.git"
@@ -13,8 +16,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts"
+    "start": "node dist/stdio.js",
+    "start:http": "node dist/server.js",
+    "dev": "ts-node src/stdio.ts",
+    "dev:http": "ts-node src/server.ts"
   },
   "keywords": [
     "mcp",

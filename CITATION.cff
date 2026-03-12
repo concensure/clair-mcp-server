@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: >-
+  If you use CLAIR (Cascaded Lazy AI Routing) in your research or products,
+  please cite it using the metadata below.
+type: software
+title: "CLAIR — Cascaded Lazy AI Routing"
+abstract: >-
+  CLAIR is a composable architecture for reducing token consumption and improving
+  capability discovery in LLM-based agent systems. It introduces a lightweight
+  always-on router (~280 tokens) that lazily loads domain-specific skill documents
+  and MCP tools only when they are relevant to the active task, and provides an
+  ML-offload routing layer that directs repetitive subtasks to efficient non-LLM
+  backends. A controlled A/B test demonstrated 72.6% average token reduction
+  (9,930 → 2,719 tokens per request) across 7 task categories including travel
+  planning, UI development, debugging, and API development.
+authors:
+  - family-names: Wu
+    given-names: Casper
+    alias: concensure
+    orcid: ""
+    email: ""
+repository-code: "https://github.com/concensure/clair-mcp-server"
+url: "https://github.com/concensure/clair-mcp-server"
+license: Apache-2.0
+version: "1.0.0"
+date-released: "2026-03-06"
+keywords:
+  - MCP
+  - Model Context Protocol
+  - lazy loading
+  - token optimization
+  - LLM efficiency
+  - skill routing
+  - AI agent
+  - context management
+  - cascaded routing
+  - ML offload
+references:
+  - type: article
+    title: "RFC-CLAIR: Cascaded Lazy AI Routing Protocol Proposal"
+    authors:
+      - family-names: Wu
+        given-names: Casper
+    year: 2026
+    url: "https://github.com/concensure/clair-mcp-server/blob/main/RFC-CLAIR.md"
+    notes: >-
+      Formal protocol specification for CLAIR. Describes the routing mechanism,
+      skill cascade design, ML offload registry, and applicability to non-Claude
+      clients including Kilo Code and OpenRouter.
+  - type: dataset
+    title: "CLAIR A/B Test Results — Travel Planner Demo"
+    authors:
+      - family-names: Wu
+        given-names: Casper
+    year: 2026
+    url: "https://github.com/concensure/clair-mcp-server/blob/main/demo/travel-planner/REPORT.md"
+    notes: >-
+      End-to-end A/B test measuring token savings across 50 tasks and 7 task
+      categories. Includes real LLM API validation via OpenRouter. Full per-task
+      breakdown and per-category analysis.

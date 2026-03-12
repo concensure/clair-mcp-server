@@ -45,6 +45,7 @@ git clone https://github.com/concensure/clair-mcp-server.git
 cd clair-mcp-server
 npm install
 npm run build
+# Compiled output: dist/stdio.js (stdio transport) and dist/server.js (HTTP transport)
 ```
 
 ## Compatibility — Works with Any MCP Client
@@ -67,26 +68,77 @@ CLAIR is **client-agnostic**. It works with any MCP-compatible AI coding assista
 
 ---
 
-## Usage with Claude Desktop
+## Usage — stdio Transport (Universal)
 
-Add to your `claude_desktop_config.json`:
+**stdio is the standard transport** for local MCP servers across all major AI coding clients. After building, use `dist/stdio.js` as the entry point.
+
+### Kilo Code (`mcp_settings.json`)
 
 ```json
 {
   "mcpServers": {
     "clair": {
       "command": "node",
-      "args": ["/path/to/clair-mcp-server/dist/index.js"]
+      "args": ["/path/to/clair-mcp-server/dist/stdio.js"],
+      "alwaysAllow": ["clair_route", "clair_list_skills", "clair_offload"]
     }
   }
 }
 ```
 
-## Usage with Claude Code
+*File location*: `%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json` (Windows)
+or `~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/mcp_settings.json` (Linux/Mac)
+
+### Claude Desktop (`claude_desktop_config.json`)
+
+```json
+{
+  "mcpServers": {
+    "clair": {
+      "command": "node",
+      "args": ["/path/to/clair-mcp-server/dist/stdio.js"]
+    }
+  }
+}
+```
+
+### Claude Code (CLI)
 
 ```bash
-claude mcp add clair node /path/to/clair-mcp-server/dist/index.js
+claude mcp add clair node /path/to/clair-mcp-server/dist/stdio.js
 ```
+
+### Cursor (`.cursor/mcp.json`)
+
+```json
+{
+  "mcpServers": {
+    "clair": {
+      "command": "node",
+      "args": ["/path/to/clair-mcp-server/dist/stdio.js"]
+    }
+  }
+}
+```
+
+### OpenAI Codex / Any MCP-compatible client
+
+```json
+{
+  "mcpServers": {
+    "clair": {
+      "command": "node",
+      "args": ["/path/to/clair-mcp-server/dist/stdio.js"]
+    }
+  }
+}
+```
+
+> **Windows paths**: Use double backslashes: `"C:\\Users\\you\\clair-mcp-server\\dist\\stdio.js"`
+
+### HTTP Transport (Remote / Team Deployment)
+
+For remote deployment (Railway, Fly.io, Render), use `dist/server.js` which exposes an HTTP endpoint at `/mcp`. See [HOSTING.md](./HOSTING.md).
 
 ## Available Tools
 
