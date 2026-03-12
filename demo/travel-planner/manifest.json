@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "skills": [
+    {
+      "id": "travel",
+      "path": "skills/domains/travel.md",
+      "token_cost": 420,
+      "triggers": ["travel", "trip", "vacation", "destination", "itinerary", "plan", "book", "visit", "explore"],
+      "children": ["flights", "accommodation", "itinerary", "transport", "dining", "family", "nature"],
+      "mcp_dependencies": ["web_search"]
+    },
+    {
+      "id": "flights",
+      "path": "skills/cascades/travel/flights.md",
+      "token_cost": 350,
+      "triggers": ["flight", "fly", "airline", "airport", "booking"],
+      "parent": "travel"
+    },
+    {
+      "id": "accommodation",
+      "path": "skills/cascades/travel/accommodation.md",
+      "token_cost": 340,
+      "triggers": ["hotel", "accommodation", "stay", "lodging", "airbnb", "resort"],
+      "parent": "travel"
+    },
+    {
+      "id": "itinerary",
+      "path": "skills/cascades/travel/itinerary.md",
+      "token_cost": 380,
+      "triggers": ["itinerary", "day", "schedule", "activities", "things to do", "sightseeing"],
+      "parent": "travel"
+    },
+    {
+      "id": "transport",
+      "path": "skills/cascades/travel/transport.md",
+      "token_cost": 320,
+      "triggers": ["transport", "car", "rental", "transfer", "transit", "train", "bus", "metro"],
+      "parent": "travel"
+    },
+    {
+      "id": "dining",
+      "path": "skills/cascades/travel/dining.md",
+      "token_cost": 300,
+      "triggers": ["restaurant", "food", "dining", "eat", "cuisine", "meal", "breakfast"],
+      "parent": "travel"
+    },
+    {
+      "id": "family",
+      "path": "skills/cascades/travel/family.md",
+      "token_cost": 360,
+      "triggers": ["family", "kids", "children", "baby", "toddler", "child-friendly"],
+      "parent": "travel"
+    },
+    {
+      "id": "nature",
+      "path": "skills/cascades/travel/nature.md",
+      "token_cost": 340,
+      "triggers": ["nature", "hiking", "outdoor", "park", "beach", "wildlife", "scenic"],
+      "parent": "travel"
+    },
+    {
+      "id": "development",
+      "path": "skills/domains/development.md",
+      "token_cost": 460,
+      "triggers": ["implement", "build", "add feature", "change", "update", "modify", "refactor", "fix", "debug", "button", "UI", "component", "style", "CSS", "layout", "form", "input", "click", "event", "state", "render", "display", "show", "hide", "toggle", "animate", "responsive", "mobile", "TypeScript", "JavaScript", "React", "Express", "API", "endpoint", "route", "server", "frontend", "backend"],
+      "children": ["ui_components", "ui_debugging", "ui_styling", "button_interaction", "state_management", "api_development"],
+      "mcp_dependencies": ["filesystem", "bash_exec"]
+    },
+    {
+      "id": "ui_components",
+      "path": "skills/cascades/dev/ui_components.md",
+      "token_cost": 480,
+      "triggers": ["component", "button", "form", "input", "modal", "card", "layout", "render", "UI", "interface", "widget", "dropdown", "checkbox", "radio", "toggle", "tab", "accordion", "tooltip", "badge", "chip", "avatar", "icon", "image", "list", "table", "grid", "flex", "responsive"],
+      "parent": "development"
+    },
+    {
+      "id": "ui_debugging",
+      "path": "skills/cascades/dev/ui_debugging.md",
+      "token_cost": 440,
+      "triggers": ["debug", "error", "broken", "not working", "fix", "issue", "bug", "crash", "undefined", "null", "TypeError", "console", "inspect", "devtools", "network", "CORS", "404", "500", "blank screen", "white screen", "layout broken", "style not applying", "event not firing", "click not working", "state not updating"],
+      "parent": "development"
+    },
+    {
+      "id": "ui_styling",
+      "path": "skills/cascades/dev/ui_styling.md",
+      "token_cost": 420,
+      "triggers": ["style", "CSS", "color", "theme", "dark mode", "light mode", "font", "typography", "spacing", "padding", "margin", "border", "shadow", "animation", "transition", "hover", "focus", "active", "responsive", "mobile", "breakpoint", "gradient", "background", "opacity", "visibility", "z-index", "overflow", "scroll", "flex", "grid", "align", "justify", "gap"],
+      "parent": "development"
+    },
+    {
+      "id": "button_interaction",
+      "path": "skills/cascades/dev/button_interaction.md",
+      "token_cost": 380,
+      "triggers": ["button", "click", "submit", "handler", "event listener", "onclick", "addEventListener", "form submit", "action", "interaction", "press", "tap", "trigger", "callback", "disabled", "loading state", "spinner", "debounce", "throttle"],
+      "parent": "development"
+    },
+    {
+      "id": "state_management",
+      "path": "skills/cascades/dev/state_management.md",
+      "token_cost": 400,
+      "triggers": ["state", "store", "data flow", "update state", "reactive", "re-render", "variable", "global state", "local state", "cache", "persist", "localStorage", "sessionStorage", "sync", "async state", "loading", "error state", "success state", "reset", "clear", "refresh"],
+      "parent": "development"
+    },
+    {
+      "id": "api_development",
+      "path": "skills/cascades/dev/api_development.md",
+      "token_cost": 430,
+      "triggers": ["API", "endpoint", "route", "REST", "HTTP", "GET", "POST", "PUT", "DELETE", "PATCH", "request", "response", "JSON", "fetch", "axios", "Express", "middleware", "CORS", "authentication", "authorization", "status code", "error handling", "validation", "body parser", "query param", "path param", "header"],
+      "parent": "development"
+    }
+  ],
+  "ml_offload_registry": []
+}

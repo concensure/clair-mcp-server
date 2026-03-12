@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Planner — CLAIR A/B Test</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Travel Planner</h1>
+      <p class="subtitle">CLAIR token savings A/B test — development tasks included</p>
+      <div id="variant-badge" class="variant-badge"></div>
+    </header>
+
+    <main>
+      <!-- Task type selector -->
+      <section class="task-selector">
+        <label for="task-type">Task type (optional — auto-detected from query)</label>
+        <div class="task-chips" id="task-chips">
+          <button type="button" class="chip active" data-task="auto">Auto-detect</button>
+          <button type="button" class="chip" data-task="travel_planning">✈ Travel Planning</button>
+          <button type="button" class="chip" data-task="ui_change">🖼 UI Change</button>
+          <button type="button" class="chip" data-task="button_interaction">🖱 Button / Interaction</button>
+          <button type="button" class="chip" data-task="debugging">🐛 Debugging</button>
+          <button type="button" class="chip" data-task="styling">🎨 Styling</button>
+          <button type="button" class="chip" data-task="state_management">🔄 State Management</button>
+          <button type="button" class="chip" data-task="api_development">⚙ API Development</button>
+        </div>
+      </section>
+
+      <!-- Example queries by category -->
+      <section class="examples">
+        <label>Example queries:</label>
+        <div class="example-list" id="example-list">
+          <button type="button" class="example-btn" data-query="Plan a trip to Tokyo with flights and hotel">✈ Plan a trip to Tokyo with flights and hotel</button>
+          <button type="button" class="example-btn" data-query="Add a 'Clear results' button to the stats panel">🖱 Add a 'Clear results' button to the stats panel</button>
+          <button type="button" class="example-btn" data-query="The submit button is not firing the click event handler">🐛 Submit button not firing click event</button>
+          <button type="button" class="example-btn" data-query="Update the variant badge color and add a hover animation">🎨 Update variant badge color and hover animation</button>
+          <button type="button" class="example-btn" data-query="The stats panel shows stale data — fix the state refresh logic">🔄 Fix stale state in stats panel</button>
+          <button type="button" class="example-btn" data-query="Add a POST /api/export endpoint to download A/B events as JSON">⚙ Add POST /api/export endpoint</button>
+          <button type="button" class="example-btn" data-query="Redesign the result card to show a token savings progress bar">🖼 Redesign result card with token savings bar</button>
+          <button type="button" class="example-btn" data-query="Find restaurants and dining options in Rome">🍽 Find restaurants in Rome</button>
+        </div>
+      </section>
+
+      <form id="plan-form">
+        <label for="query">Describe your task or query:</label>
+        <textarea
+          id="query"
+          placeholder="e.g. Add a 'Clear results' button to the stats panel, or: Plan a trip to Paris in April"
+          rows="3"
+        ></textarea>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">Submit</button>
+          <button type="button" id="reset-btn" class="btn-outline">Reset test data</button>
+        </div>
+      </form>
+
+      <section id="result" class="result hidden">
+        <h2>Result</h2>
+        <p id="response"></p>
+        <div id="task-category-badge" class="task-category-badge"></div>
+        <div id="metrics" class="metrics"></div>
+        <div id="token-bar-container" class="token-bar-container hidden">
+          <div class="token-bar-label">
+            <span>Tokens used</span>
+            <span id="token-bar-value"></span>
+          </div>
+          <div class="token-bar">
+            <div id="token-bar-fill" class="token-bar-fill"></div>
+          </div>
+          <div class="token-bar-label muted">
+            <span>0</span>
+            <span id="token-bar-max"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="stats" class="stats">
+        <div class="stats-header">
+          <h2>A/B Test Stats</h2>
+          <button id="refresh-stats" type="button" class="btn-outline btn-sm">↻ Refresh</button>
+        </div>
+        <div id="stats-content">No data yet. Submit a few queries to see stats.</div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <strong>Control (A):</strong> Full context — all skills loaded upfront (~full manifest tokens).
+        <strong>CLAIR (B):</strong> Lazy routing — router (~280 tokens) + only relevant skills loaded.
+      </p>
+      <p class="muted">
+        <a href="/api/export" target="_blank">Export events JSON</a> ·
+        <a href="/api/ab-stats" target="_blank">Raw stats JSON</a>
+      </p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

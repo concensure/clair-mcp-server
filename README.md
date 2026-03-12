@@ -2,6 +2,8 @@
 
 > An MCP server that reduces token burn by lazily loading skills and tools only when needed, and routing repetitive subtasks to ML backends instead of the LLM.
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 ## Why CLAIR?
 
 Loading all MCP tools and skill documents upfront can consume 5,000–15,000 tokens before the user's first message is processed. CLAIR introduces a 280-token always-on router that:
@@ -10,18 +12,37 @@ Loading all MCP tools and skill documents upfront can consume 5,000–15,000 tok
 2. **Returns** only the skills and tools relevant to that task
 3. **Identifies** subtasks that can bypass the LLM entirely via small ML models
 
+## Proven Results — A/B Test
+
+A controlled A/B test was run against a real Travel Planner web application across **50 tasks** spanning **7 task categories** (travel planning, UI changes, debugging, styling, state management, API development, button interactions).
+
+| Metric | Control (full load) | CLAIR (lazy) | Improvement |
+|--------|--------------------|-----------|-----------| 
+| Avg tokens/request | 9,930 | 2,719 | **−72.6%** |
+| Skills loaded | 15 (always) | 3.8 (avg) | **−74.7%** |
+| Best category | 9,930 | 559 | **−94.4%** |
+| Worst category | 9,930 | 4,361 | **−56.1%** |
+
+Real LLM API calls (OpenRouter) confirmed the estimates:
+- Control: **9,740 real prompt tokens** per request
+- CLAIR travel query: **328 real prompt tokens** (−96.6% vs control)
+- CLAIR dev task: **2,982 real prompt tokens** (−69.4% vs control)
+
+**→ See the full report: [`demo/travel-planner/REPORT.md`](./demo/travel-planner/REPORT.md)**  
+**→ Run the demo: [`demo/travel-planner/`](./demo/travel-planner/)**
+
 ## Architecture
 
 ```
 User Request → CLAIR Router (~280 tokens) → Domain Skill → Cascade Skill → LLM
-                                          ↘ ML Backend (for repetitive tasks)
+                                           ↘ ML Backend (for repetitive tasks)
 ```
 
 ## Installation
 
 ```bash
-git clone https://github.com/concensure/clair-mcp-server
-cd clair-mcp-server
+git clone https://github.com/concensure/clair-mcp
+cd clair-mcp
 npm install
 npm run build
 ```
@@ -134,12 +155,12 @@ skills/
 ### Adding a new skill
 
 1. Create your skill markdown file in `skills/domains/` or `skills/cascades/`
-2. Add an entry to `skills/manifest.json`
+2. Add an entry to `manifest.json`
 3. Include trigger keywords and token cost estimate
 
 ### Adding an ML backend
 
-Add an entry to the `ml_offload_registry` in `skills/manifest.json`:
+Add an entry to the `ml_offload_registry` in `manifest.json`:
 
 ```json
 {
@@ -153,17 +174,28 @@ Add an entry to the `ml_offload_registry` in `skills/manifest.json`:
 }
 ```
 
+## Demo
+
+The [`demo/travel-planner/`](./demo/travel-planner/) directory contains a complete A/B test demo:
+
+- A Travel Planner web app with real LLM integration (OpenRouter)
+- 15 skills across travel and software development domains
+- Automated 50-task simulation script
+- Full A/B test report with per-category breakdown
+
 ## Hosting
 
 **Recommended:** Railway, Fly.io, or Render for remote HTTP transport.  
 **Local dev:** stdio transport (default, no server needed).
 
-See [HOSTING.md](./docs/HOSTING.md) for deployment guides.
+See [HOSTING.md](./HOSTING.md) for deployment guides.
 
 ## RFC
 
-The formal proposal for the CLAIR protocol is in [docs/RFC-CLAIR.md](./docs/RFC-CLAIR.md).
+The formal proposal for the CLAIR protocol is in [RFC-CLAIR.md](./RFC-CLAIR.md).
 
 ## License
 
-MIT
+Apache 2.0 — see [LICENSE](./LICENSE).
+
+Free to use commercially with attribution. See the [licence comparison](./RFC-CLAIR.md#licence) for details.
