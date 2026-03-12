@@ -170,6 +170,19 @@ skills/
 | Regex extraction | Rules | 99% | 1ms |
 | Tabular classification | sklearn | 88% | 8ms |
 
+## How Routing Works (Zero LLM Tokens)
+
+CLAIR's routing is **pure keyword matching** — no LLM is invoked at routing time. The developer writes a `manifest.json` once with trigger keywords for each skill. At request time, CLAIR scans the user's query for those keywords in microseconds.
+
+```
+Token cost of routing: ~280 tokens (router overhead) + 0 LLM tokens
+Token cost of NOT routing: 5,000–15,000 tokens (all skills loaded upfront)
+```
+
+**→ See [MANIFEST_GUIDE.md](./MANIFEST_GUIDE.md)** for how to write the manifest, organize the skill tree, and validate triggers — without consuming any LLM tokens.
+
+---
+
 ## Extending CLAIR
 
 ### Adding a new skill

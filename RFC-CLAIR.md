@@ -261,9 +261,124 @@ Every CLAIR-compatible skill directory MUST include a `manifest.json`:
 
 ---
 
-## 5. Implementation Notes
+## 5. Routing Mechanism — How Skills Are Organized and When They Load
 
-### 5.1 Backwards Compatibility
+### 5.1 The Router Does NOT Use an LLM
+
+This is the most important design principle: **CLAIR's routing is deterministic keyword matching, not an LLM call.**
+
+The router is a pure function:
+```
+f(query: string, manifest: Manifest) → MatchedSkill[]
+```
+
+It scans the user's query for trigger keywords defined in the manifest. No LLM is invoked. No tokens are consumed beyond the router's own ~280-token overhead. The routing decision is made in microseconds.
+
+```typescript
+// Actual routing logic — pure string matching
+function findSkills(manifest: Manifest, query: string): Skill[] {
+  const lower = query.toLowerCase();
+  return manifest.skills.filter((skill) =>
+    skill.triggers.some((t) => lower.includes(t.toLowerCase()))
+  );
+}
+```
+
+**Token cost of routing**: ~280 tokens (router manifest) + 0 LLM tokens = 280 tokens total overhead.
+**Token cost of NOT routing**: 5,000–15,000 tokens (all skills loaded upfront).
+**Break-even**: CLAIR pays for itself if it saves even 1 skill from being loaded.
+
+### 5.2 Who Organizes the Skill Tree?
+
+**The developer** organizes the skill tree — once, at setup time. This is a one-time authoring cost, not a per-request cost.
+
+The developer writes a `manifest.json` that declares:
+1. Which skill files exist
+2. What keywords trigger each skill
+3. Which skills are parents/children of others
+
+```json
+{
+  "id": "coding",
+  "path": "skills/domains/coding.md",
+  "token_cost": 420,
+  "triggers": ["code", "function", "implement", "bug", "refactor", "debug"],
+  "children": ["python", "typescript", "testing"]
+}
+```
+
+This is analogous to writing a `package.json` or a `routes.ts` file — a one-time configuration that the system uses at runtime.
+
+### 5.3 Developer Tooling — Writing the Manifest Without Consuming Tokens
+
+Writing a good manifest does not require LLM calls. Three practical approaches:
+
+#### Approach 1: Manual (Recommended for Small Skill Sets)
+Write the manifest by hand. For each skill file, ask: "What words would a user type that should load this skill?" List 5–15 keywords. This takes 10–30 minutes for a typical skill set.
+
+```json
+// For a "flights" skill, triggers are obvious:
+"triggers": ["flight", "fly", "airline", "airport", "booking", "depart", "arrive"]
+```
+
+#### Approach 2: Keyword Extraction Script (Zero LLM tokens)
+Run a script that reads each skill file and extracts the most frequent domain-specific nouns and verbs. These become trigger candidates.
+
+```bash
+# Example: extract top keywords from a skill file
+cat skills/domains/coding.md | tr ' ' '\n' | sort | uniq -c | sort -rn | head -20
+```
+
+Review the output and select the most discriminating keywords. Total cost: 0 tokens.
+
+#### Approach 3: One-Time LLM-Assisted Manifest Generation (Amortized Cost)
+Use an LLM once to generate the initial manifest from your skill files. This is a setup cost, not a per-request cost. If CLAIR saves 7,000 tokens per request and you make 100 requests, the one-time manifest generation cost (~2,000 tokens) is recovered after the first request.
+
+```
+Prompt: "Read these skill files and generate a manifest.json with trigger keywords for each.
+Files: [paste skill file contents]"
+```
+
+The generated manifest is then used for all future requests with zero additional LLM cost.
+
+### 5.4 Trigger Quality and False Negatives
+
+The main risk with keyword matching is **false negatives** — a query that should load a skill but doesn't match any trigger. Mitigation strategies:
+
+1. **Broad triggers**: Include synonyms, abbreviations, and common misspellings
+2. **Parent skill fallback**: If no specific skill matches, load the parent domain skill
+3. **Default skill**: Define a `default` skill that loads when nothing matches
+4. **Monitoring**: Log unmatched queries and add triggers for common patterns
+
+```json
+{
+  "id": "general_fallback",
+  "path": "skills/domains/general.md",
+  "token_cost": 200,
+  "triggers": [],
+  "is_default": true
+}
+```
+
+### 5.5 Trigger Quality and False Positives
+
+False positives (loading a skill that isn't needed) waste tokens but don't break functionality. They are less harmful than false negatives. The A/B test showed that even in the worst case (button interaction tasks triggering 5 cascades), CLAIR still saved 56% of tokens vs. full load.
+
+### 5.6 Advanced: Semantic Routing (Optional Upgrade)
+
+For teams that want higher routing accuracy without keyword maintenance, CLAIR supports an optional semantic routing layer:
+
+1. **Embedding-based routing**: Embed the user query and each skill description; load skills whose embeddings are closest. Cost: ~1 embedding API call (~50 tokens) per request.
+2. **Small classifier**: Train a tiny text classifier (e.g., fastText, ~1MB) on labeled examples. Cost: 0 tokens, <1ms latency.
+3. **Hybrid**: Use keyword matching as a fast first pass; fall back to semantic matching for unmatched queries.
+
+The reference implementation uses keyword matching (Approach 1) as the default. Semantic routing is an optional upgrade for production deployments.
+
+---
+
+## 6. Implementation Notes
+
+### 6.1 Backwards Compatibility
 
 CLAIR is fully additive. Existing MCP servers and skills require no modification. The router is an optional layer — Claude can still be used without it; CLAIR simply improves efficiency when present.
 
