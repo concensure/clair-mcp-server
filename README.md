@@ -47,6 +47,26 @@ npm install
 npm run build
 ```
 
+## Compatibility — Works with Any MCP Client
+
+CLAIR is **client-agnostic**. It works with any MCP-compatible AI coding assistant:
+
+| Client | LLM | Status |
+|--------|-----|--------|
+| Claude Desktop | Claude | ✅ Full support |
+| Claude Code | Claude | ✅ Full support |
+| **Kilo Code** | **OpenRouter / any** | ✅ **Full support** |
+| Cursor | OpenAI / Anthropic | ✅ Full support (via MCP) |
+| Any MCP client | Any | ✅ Full support |
+
+**Kilo Code users**: CLAIR works with Kilo Code + OpenRouter. Call `clair_route` before attaching skill/rule documents. CLAIR's output tells you exactly which documents to attach for the current task — compatible with Kilo Code's skill document attachment feature.
+
+**Rule documents**: CLAIR's manifest can point to any markdown file — skill documents, Kilo Code `.rules` files, or custom instruction files. No modification required.
+
+**MCP tool savings**: CLAIR also reduces MCP tool token costs. With 20 tools loaded upfront (~4,000–8,000 tokens), CLAIR routes which tools are needed per request, reducing tool context to ~800–1,200 tokens (75–90% savings). See [RFC-CLAIR.md §8.3](./RFC-CLAIR.md) for details.
+
+---
+
 ## Usage with Claude Desktop
 
 Add to your `claude_desktop_config.json`:

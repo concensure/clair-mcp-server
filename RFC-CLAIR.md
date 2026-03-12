@@ -1,11 +1,11 @@
 # RFC: CLAIR — Cascaded Lazy AI Routing
 
-**RFC Number**: CLAIR-001  
-**Status**: Draft  
+**RFC Number**: CLAIR-001
+**Status**: Draft
 **Author(s)**: Casper Wu
-**Created**: 2026-03-06  
-**Last Updated**: 2026-03-06  
-**Target Audience**: MCP implementors, AI agent framework developers, Anthropic platform team  
+**Created**: 2026-03-06
+**Last Updated**: 2026-03-12
+**Target Audience**: MCP implementors, AI agent framework developers, Anthropic platform team, Kilo Code users, OpenRouter users
 **Repository**: https://github.com/modelcontextprotocol/specification (proposed discussion target)
 
 ---
@@ -305,16 +305,84 @@ It includes:
 
 ---
 
-## 8. Open Questions
+## 8. Applicability Beyond Claude Code
+
+### 8.1 CLAIR with Non-Claude-Code Clients (Kilo Code, OpenRouter, etc.)
+
+CLAIR is **client-agnostic**. It is an MCP server that exposes standard MCP tools (`clair_route`, `clair_list_skills`, `clair_offload`). Any MCP-compatible client can call it, regardless of the underlying LLM provider.
+
+**Kilo Code + OpenRouter**: Kilo Code supports MCP servers and can call `clair_route` before loading context documents. The routing decision returned by CLAIR tells the client which skill/rule documents to attach for the current task. Kilo Code's skill document attachment feature (added in recent updates) is directly compatible with CLAIR's output format.
+
+**No modification required** for the core CLAIR server. The client integration pattern is:
+```
+1. User submits task
+2. Client calls clair_route({ task_description: userQuery })
+3. CLAIR returns { load_skills: [...], load_tools: [...] }
+4. Client attaches only the returned skill/rule documents to context
+5. Client exposes only the returned MCP tools for this request
+```
+
+### 8.2 Rule Documents vs Skill Documents
+
+CLAIR's skill documents are standard markdown files. They are functionally identical to:
+- Kilo Code `.rules` files
+- Claude Code custom instructions
+- Any system prompt injection mechanism
+
+The manifest simply maps trigger keywords to file paths. The files can be:
+- Skill documents (CLAIR's native format)
+- Rule documents (Kilo Code format)
+- Custom instruction files (any format)
+- Prompt templates
+
+**No modification to CLAIR is required** to support rule documents. Simply point the manifest `path` entries to your rule files.
+
+### 8.3 MCP Tool Token Savings — A Key Use Case
+
+This is one of CLAIR's most impactful applications. MCP tool schemas are expensive:
+
+| Scenario | Token cost |
+|----------|-----------|
+| 20 MCP tools loaded upfront | ~4,000–8,000 tokens |
+| CLAIR router only | ~280 tokens |
+| CLAIR + 2 relevant tools | ~800–1,200 tokens |
+| **Savings** | **~75–90%** |
+
+CLAIR's `clair_route` output includes a `load_tools` array specifying which MCP tool IDs are needed for the current task. The client should only expose those tools to the LLM for that request.
+
+**Example**: A user asks "find flights to Paris". CLAIR returns:
+```json
+{
+  "load_skills": [{ "id": "travel", ... }, { "id": "flights", ... }],
+  "load_tools": [{ "id": "web_search", "reason": "Required by travel skill" }]
+}
+```
+The client exposes only `web_search` — not `filesystem`, `bash_exec`, `python_exec`, `database_query`, etc. This prevents the LLM from hallucinating calls to irrelevant tools and saves thousands of tokens.
+
+### 8.4 What Needs to Change for Full MCP Tool Lazy Loading
+
+The current CLAIR reference implementation routes skill documents. To add full MCP tool lazy loading:
+
+1. **Manifest extension**: Add `mcp_tool_schemas` to the manifest with token costs and triggers for each MCP tool
+2. **Client-side enforcement**: The MCP client must support dynamic tool exposure (not all clients do yet)
+3. **Tool schema caching**: Cache tool schemas client-side; only send the relevant subset to the LLM per request
+
+This is a client-side concern — CLAIR's server-side routing logic requires no changes. The `load_tools` field in `clair_route` output already supports this pattern.
+
+---
+
+## 9. Open Questions
 
 1. Should the Capability Manifest be a first-class MCP resource type, or remain a filesystem convention?
 2. Should routing decisions be logged for learning/improvement? What are the privacy implications?
 3. Should CLAIR define a standard `skill://` URI scheme for cross-server skill references?
 4. How should conflicts between multiple CLAIR routers in the same session be resolved?
+5. Should CLAIR support a "tool manifest" standard for MCP tool lazy loading, separate from skill documents?
+6. How should Kilo Code and other non-Claude clients integrate CLAIR's routing decisions into their context attachment APIs?
 
 ---
 
-## 9. Acknowledgements
+## 10. Acknowledgements
 
 This proposal builds on:
 - The MCP specification and SDK developed by Anthropic
@@ -327,11 +395,12 @@ Special thanks to the `modelcontextprotocol` GitHub community for early discussi
 
 ---
 
-## 10. Revision History
+## 11. Revision History
 
 | Version | Date | Summary |
 |---|---|---|
 | 0.1 | 2026-03-06 | Initial draft |
+| 0.2 | 2026-03-12 | Add Section 8: applicability to non-Claude clients (Kilo Code, OpenRouter), rule documents, MCP tool lazy loading. Add A/B test results. Update open questions. |
 
 ---
 
