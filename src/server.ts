@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import express, { type Request, type Response } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { Manifest, Skill } from './types';
@@ -118,14 +117,16 @@ function buildServer(manifest: Manifest) {
 async function main() {
   const manifest = loadManifest();
 
-  const app = createMcpExpressApp();
+  const app = express();
+  app.use(express.json());
 
   // Health check endpoint for Railway / load balancers
   app.get('/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok', server: 'clair-mcp-server', version: '1.0.0' });
   });
 
-  app.post('/mcp', async (req: Request, res: Response) => {
+  // Shared transport handler for both GET (SSE) and POST (JSON-RPC)
+  const handleMcp = async (req: Request, res: Response) => {
     const server = buildServer(manifest);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined, // stateless
@@ -133,7 +134,15 @@ async function main() {
     });
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
-  });
+    res.on('close', () => {
+      transport.close();
+      server.close();
+    });
+  };
+
+  app.get('/mcp', handleMcp);
+  app.post('/mcp', handleMcp);
+  app.delete('/mcp', handleMcp);
 
   const port = Number(process.env.PORT ?? 3001);
   const host = process.env.HOST ?? '0.0.0.0';
